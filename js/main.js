@@ -18,7 +18,7 @@ function toast(msg) {
 }
 
 /* ---------------- 4D Tesseract scene ---------------- */
-const state = { planes: { xw: true, yw: true, zw: true }, manualW: 0, warp: 0, dragX: 0, dragY: 0, scroll: 0 };
+const state = { planes: { xw: true, yw: true, zw: true }, manualW: 0, warp: 0, page: 0, dragX: 0, dragY: 0, scroll: 0 };
 let renderer;
 try {
   renderer = new THREE.WebGLRenderer({ canvas: $('#hyper'), antialias: true, alpha: true });
@@ -141,6 +141,121 @@ if (renderer) {
   }
   addEventListener('resize', resize); resize();
 
+  /* ---------- Solar system: planets fly in and out with scroll ---------- */
+  scene.add(new THREE.AmbientLight(0xffffff, 0.35));
+  const sunLight = new THREE.DirectionalLight(0xfff1d6, 2.2);
+  sunLight.position.set(-6, 4, 8);
+  scene.add(sunLight);
+
+  function planetTex(base, opts = {}) {
+    const c = document.createElement('canvas'); c.width = 512; c.height = 256;
+    const x = c.getContext('2d');
+    x.fillStyle = base; x.fillRect(0, 0, 512, 256);
+    if (opts.bands) {
+      for (let y = 0; y < 256; y += 2) {
+        const n = Math.sin(y * 0.09) * 0.5 + Math.sin(y * 0.23 + 1) * 0.3 + Math.random() * 0.2;
+        x.fillStyle = opts.bands[Math.floor(Math.abs(n) * opts.bands.length) % opts.bands.length];
+        x.globalAlpha = 0.55; x.fillRect(0, y, 512, 2);
+      }
+      x.globalAlpha = 1;
+    }
+    if (opts.spots) {
+      for (let i = 0; i < opts.spots.n; i++) {
+        x.fillStyle = opts.spots.colors[i % opts.spots.colors.length];
+        x.globalAlpha = opts.spots.alpha ?? 0.5;
+        x.beginPath();
+        x.ellipse(Math.random() * 512, 30 + Math.random() * 196, 8 + Math.random() * opts.spots.size, 5 + Math.random() * opts.spots.size * 0.6, Math.random() * 3, 0, Math.PI * 2);
+        x.fill();
+      }
+      x.globalAlpha = 1;
+    }
+    if (opts.redSpot) { x.fillStyle = '#b5523b'; x.beginPath(); x.ellipse(330, 165, 34, 18, 0, 0, Math.PI * 2); x.fill(); }
+    if (opts.caps) { x.fillStyle = '#ffffff'; x.fillRect(0, 0, 512, 14); x.fillRect(0, 242, 512, 14); }
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+  }
+
+  const BODIES = [
+    { name: 'The Sun', r: 3.2, sun: true, color: '#ffb547', tex: { bands: ['#ffcf5a', '#ff9a2e', '#ffe08a'], spots: { n: 60, colors: ['#ff7a1a', '#fff1a8'], size: 20, alpha: 0.4 } } },
+    { name: 'Mercury', r: 0.7, color: '#9a8f86', tex: { spots: { n: 90, colors: ['#6f665f', '#b8aea4'], size: 12 } } },
+    { name: 'Venus', r: 1.15, color: '#e3bb76', tex: { bands: ['#e8c47f', '#d9a35a', '#f1d79d'] } },
+    { name: 'Earth', r: 1.2, color: '#1f5fbf', moon: true, tex: { spots: { n: 45, colors: ['#2f8a3a', '#3f9e45', '#c2b280'], size: 40, alpha: 0.85 }, caps: true } },
+    { name: 'Mars', r: 0.9, color: '#c1440e', tex: { spots: { n: 70, colors: ['#8a2f0a', '#e0723a'], size: 22 }, caps: true } },
+    { name: 'Jupiter', r: 2.6, color: '#c99b6d', tex: { bands: ['#e3c7a2', '#b07a4f', '#f0e2c8', '#8d5a3b'], redSpot: true } },
+    { name: 'Saturn', r: 2.1, color: '#e2c88f', ring: true, tex: { bands: ['#f0dba8', '#cfae6e', '#e6cf97'] } },
+    { name: 'Uranus', r: 1.6, color: '#8fd9e0', tex: { bands: ['#9be3ea', '#7fcbd4'] } },
+    { name: 'Neptune', r: 1.55, color: '#3a5fd9', tex: { bands: ['#4169e1', '#2c48b5', '#5b7ff0'], spots: { n: 3, colors: ['#1d2f80'], size: 18, alpha: 0.7 } } },
+  ];
+
+  const solar = new THREE.Group();
+  scene.add(solar);
+  const planets = BODIES.map((b, i) => {
+    const holder = new THREE.Group();
+    const mat = b.sun
+      ? new THREE.MeshBasicMaterial({ map: planetTex(b.color, b.tex) })
+      : new THREE.MeshStandardMaterial({ map: planetTex(b.color, b.tex), roughness: 0.9, metalness: 0 });
+    const mesh = new THREE.Mesh(new THREE.SphereGeometry(b.r, 48, 32), mat);
+    mesh.rotation.z = 0.3;
+    holder.add(mesh);
+    // atmosphere / corona glow
+    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: b.color, transparent: true, opacity: b.sun ? 0.9 : 0.35, depthWrite: false, blending: THREE.AdditiveBlending }));
+    glow.scale.setScalar(b.r * (b.sun ? 4.2 : 2.8));
+    holder.add(glow);
+    if (b.ring) {
+      const rc = document.createElement('canvas'); rc.width = 256; rc.height = 4;
+      const rx = rc.getContext('2d');
+      for (let k = 0; k < 256; k++) { rx.fillStyle = `rgba(230,205,150,${(0.25 + 0.6 * Math.abs(Math.sin(k * 0.17))) * (k > 40 && k < 60 ? 0.15 : 1)})`; rx.fillRect(k, 0, 1, 4); }
+      const ringGeo = new THREE.RingGeometry(b.r * 1.3, b.r * 2.3, 96);
+      const pos = ringGeo.attributes.position, uv = ringGeo.attributes.uv;
+      for (let k = 0; k < pos.count; k++) { const d = Math.hypot(pos.getX(k), pos.getY(k)); uv.setXY(k, (d - b.r * 1.3) / (b.r * 1.0), 0.5); }
+      const ring = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(rc), transparent: true, side: THREE.DoubleSide, depthWrite: false }));
+      ring.rotation.x = -1.2; ring.rotation.y = 0.3;
+      holder.add(ring);
+    }
+    let moon = null;
+    if (b.moon) {
+      moon = new THREE.Mesh(new THREE.SphereGeometry(0.3, 24, 16), new THREE.MeshStandardMaterial({ color: 0xcfcfcf, roughness: 1 }));
+      holder.add(moon);
+    }
+    holder.visible = false;
+    solar.add(holder);
+    return { ...b, holder, mesh, moon, side: i % 2 === 0 ? 1 : -1, at: 0.05 + i * (0.9 / (BODIES.length - 1)), spin: 0 };
+  });
+
+  const label = $('#planet-label');
+  let lastPage = 0, scrollVel = 0, currentName = '';
+  const smooth = (a, b, x) => { const k = Math.min(1, Math.max(0, (x - a) / (b - a))); return k * k * (3 - 2 * k); };
+  function updatePlanets(dt, time) {
+    const page = state.page;
+    scrollVel += ((page - lastPage) / Math.max(dt, 0.001) - scrollVel) * 0.1;
+    lastPage = page;
+    const narrow = innerWidth < 760;
+    let nearest = null, nearestD = 1e9;
+    for (const p of planets) {
+      const t = (page - p.at) / 0.14; // -1: far away, +1: flown past
+      if (t < -1 || t > 1) { p.holder.visible = false; continue; }
+      p.holder.visible = true;
+      const k = (t + 1) / 2;
+      const spread = narrow ? 2.6 : 5;
+      p.holder.position.set(
+        p.side * (spread + k * k * 6),
+        (p.side > 0 ? 1 : -1.2) + Math.sin(time * 0.4 + p.at * 10) * 0.3 - k * 1.5,
+        -48 + k * 52
+      );
+      const s = smooth(-1, -0.55, t) * (narrow ? 0.7 : 1);
+      p.holder.scale.setScalar(Math.max(0.001, s));
+      p.spin += dt * (0.15 + Math.min(Math.abs(scrollVel) * 6, 4));
+      p.mesh.rotation.y = p.spin * (p.sun ? 0.3 : 1);
+      if (p.moon) p.moon.position.set(Math.cos(time * 0.8) * p.r * 2, 0.3, Math.sin(time * 0.8) * p.r * 2);
+      if (Math.abs(t) < nearestD) { nearestD = Math.abs(t); nearest = p; }
+    }
+    const name = nearest && nearestD < 0.6 ? nearest.name : '';
+    if (name !== currentName && label) {
+      currentName = name;
+      label.classList.toggle('show', !!name);
+      if (name) label.querySelector('b').textContent = name;
+    }
+  }
+
   const clock = new THREE.Clock();
   let t = 0;
   const v = [0, 0, 0, 0];
@@ -202,6 +317,7 @@ if (renderer) {
     camera.updateProjectionMatrix();
     camera.lookAt(0, 0, 0);
 
+    updatePlanets(dt, t);
     state.warp *= 0.985;
     renderer.render(scene, camera);
     requestAnimationFrame(frame);
@@ -229,6 +345,7 @@ function onScroll() {
   const p = max > 0 ? scrollY / max : 0;
   progress.style.width = (p * 100) + '%';
   state.scroll = scrollY / innerHeight;
+  state.page = p;
   let current = '';
   $$('main section[id]').forEach(s => { if (s.getBoundingClientRect().top < innerHeight * 0.4) current = s.id; });
   navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + current));
@@ -361,7 +478,6 @@ const commands = [
   { label: 'Go to About', hint: 'section', run: () => go('#about') },
   { label: 'Go to Skills', hint: 'section', run: () => go('#skills') },
   { label: 'Go to Projects', hint: 'section', run: () => go('#projects') },
-  { label: 'Go to Terminal', hint: 'section', run: () => go('#terminal') },
   { label: 'Go to Contact', hint: 'section', run: () => go('#contact') },
   { label: 'Play Hyper Shift', hint: 'game', run: () => location.href = 'game.html' },
   { label: 'Open GitHub', hint: 'link', run: () => open('https://github.com/rajatranjan06-source', '_blank', 'noopener') },
@@ -418,54 +534,3 @@ addEventListener('keydown', e => {
   }
 });
 
-/* ---------------- Terminal ---------------- */
-const out = $('#term-out'), tin = $('#term-in');
-const history = []; let hIdx = 0;
-function print(html, cls = '') { const d = document.createElement('div'); if (cls) d.className = cls; d.innerHTML = html; out.appendChild(d); out.scrollTop = out.scrollHeight; }
-const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const cmds = {
-  help: () => 'Available commands:\n  about      who is Rajat\n  skills     tech stack\n  projects   list of projects with links\n  contact    how to reach me\n  game       launch Hyper Shift\n  warp       engage warp drive\n  4d         explain the tesseract\n  clear      clear the screen\n  sudo hire rajat',
-  about: () => 'Rajat Ranjan: Software Development Intern from Noida, India.\nFull-stack web apps and Generative AI applications.',
-  whoami: () => 'a curious visitor in the 4th dimension',
-  skills: () => 'frontend : TypeScript, JavaScript, React, Next.js, Tailwind, WebGL\nbackend  : Node.js, Python, MongoDB, REST APIs\ngen ai   : LLMs, RAG, ChromaDB, TTS, MediaPipe, Streamlit',
-  projects: () => [
-    ['PrepKit', 'https://prep-kit-eight.vercel.app'],
-    ['Persona Support Agent', 'https://persona-adaptive-saas-customer-support-agent.streamlit.app/'],
-    ['AirDrawer', 'https://air-drawer-two.vercel.app'],
-    ['YouTube Shorts Bot', 'https://github.com/rajatranjan06-source/youtube-shorts-bot'],
-    ['Ifeels', 'https://ifeels.vercel.app'],
-    ['Dentis Website', 'https://dentis-website-omega.vercel.app'],
-  ].map(([n, u]) => `  ${n.padEnd(24)}<a href="${u}" target="_blank" rel="noopener">${u.replace('https://', '')}</a>`).join('\n'),
-  contact: () => 'email : <a href="mailto:Rajatranjan06@gmail.com">Rajatranjan06@gmail.com</a>\nphone : <a href="tel:+916397068019">+91 6397068019</a>\ngithub: <a href="https://github.com/rajatranjan06-source" target="_blank" rel="noopener">github.com/rajatranjan06-source</a>',
-  game: () => { setTimeout(() => location.href = 'game.html', 700); return 'Loading Hyper Shift...'; },
-  play: () => cmds.game(),
-  warp: () => { warp(); return 'Warp drive engaged.'; },
-  '4d': () => 'A tesseract has 16 vertices, 32 edges, 24 square faces and 8 cubic cells.\nThe one behind this page rotates in the XW, YW and ZW planes, then gets\nprojected from 4D into 3D, and from 3D onto your screen.',
-  date: () => new Date().toString(),
-  ls: () => 'about.txt  skills.json  projects/  game.html  secrets.txt',
-  'cat secrets.txt': () => 'Nice try. The only secret is: ship things.',
-  'sudo hire rajat': () => 'Permission granted. Opening mail client...' + (setTimeout(() => location.href = 'mailto:Rajatranjan06@gmail.com?subject=Let%27s%20work%20together', 800), ''),
-  sudo: () => 'rajat is not in the sudoers file. This incident will be reported. (try: sudo hire rajat)',
-  exit: () => 'There is no exit from the 4th dimension.',
-};
-print('Welcome to RajatOS 4.0 (hyperspace edition)\nType <span class="cmd">help</span> to get started.');
-$('#term-form').addEventListener('submit', e => {
-  e.preventDefault();
-  const raw = tin.value.trim(); tin.value = '';
-  if (!raw) return;
-  history.push(raw); hIdx = history.length;
-  print('<span class="cmd">$ ' + esc(raw) + '</span>');
-  const key = raw.toLowerCase().replace(/\s+/g, ' ');
-  if (key === 'clear') { out.innerHTML = ''; return; }
-  const fn = cmds[key];
-  if (fn) print(fn()); else print(`command not found: ${esc(raw)}. Type 'help'.`, 'err');
-});
-tin.addEventListener('keydown', e => {
-  if (e.key === 'ArrowUp' && hIdx > 0) { tin.value = history[--hIdx]; e.preventDefault(); }
-  if (e.key === 'ArrowDown') { hIdx = Math.min(history.length, hIdx + 1); tin.value = history[hIdx] || ''; e.preventDefault(); }
-  if (e.key === 'Tab') {
-    e.preventDefault();
-    const m = Object.keys(cmds).filter(k => k.startsWith(tin.value.toLowerCase()));
-    if (m.length === 1) tin.value = m[0];
-  }
-});
