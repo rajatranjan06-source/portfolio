@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Hyper Shift | A 4D game by Rajat Ranjan</title>
+<meta name="description" content="Hyper Shift: race through a 4D tunnel and shift between dimensions to phase through walls. A mini game by Rajat Ranjan.">
+<meta name="theme-color" content="#05060f">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/game.css?v=1">
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div class="hud mono" id="hud">
+  <a href="index.html" class="back">&larr; Portfolio</a>
+  <div class="hud-mid">
+    <div><small>SCORE</small><b id="score">0</b></div>
+    <div><small>BEST</small><b id="best">0</b></div>
+    <div><small>COMBO</small><b id="combo">x1</b></div>
+  </div>
+  <button id="pause-btn" class="icon" aria-label="Pause">II</button>
+</div>
+
+<div class="phase-bar" id="phase-bar">
+  <button data-p="0" class="ph ph0 active" aria-label="Shift to cyan dimension"><span>1</span>CYAN</button>
+  <button data-p="1" class="ph ph1" aria-label="Shift to magenta dimension"><span>2</span>MAGENTA</button>
+  <button data-p="2" class="ph ph2" aria-label="Shift to gold dimension"><span>3</span>GOLD</button>
+</div>
+
+<div class="overlay" id="menu">
+  <div class="panel">
+    <p class="mono tag">A 4D MINI GAME BY RAJAT RANJAN</p>
+    <h1>HYPER<br>SHIFT</h1>
+    <p>Every wall exists in only one dimension. Solid walls match <b>your</b> colour and will destroy you. Faded walls belong to another dimension, so you fly straight through them.</p>
+    <ul class="mono keys">
+      <li><kbd>&larr;</kbd><kbd>&rarr;</kbd> or <kbd>A</kbd><kbd>D</kbd> move (or drag on touch)</li>
+      <li><kbd>Space</kbd> cycle dimension, <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> pick one</li>
+      <li>Collect white shards for bonus points and combo</li>
+      <li><kbd>P</kbd> pause</li>
+    </ul>
+    <button class="btn" id="start">&#9654; START</button>
+    <a class="link mono" href="index.html">Back to portfolio</a>
+  </div>
+</div>
+
+<div class="overlay" id="over" hidden>
+  <div class="panel">
+    <p class="mono tag">DIMENSIONAL COLLAPSE</p>
+    <h2 id="over-title">GAME OVER</h2>
+    <p class="final mono">Score <b id="final">0</b></p>
+    <p class="mono small" id="best-line"></p>
+    <button class="btn" id="restart">&#8635; PLAY AGAIN</button>
+    <div class="row">
+      <a class="link mono" href="index.html">Back to portfolio</a>
+      <a class="link mono" href="index.html#projects">See Rajat's projects</a>
+      <a class="link mono" href="mailto:Rajatranjan06@gmail.com?subject=I%20played%20Hyper%20Shift" id="brag">Tell Rajat your score</a>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="paused" hidden>
+  <div class="panel">
+    <h2>PAUSED</h2>
+    <button class="btn" id="resume">&#9654; RESUME</button>
+    <a class="link mono" href="index.html">Back to portfolio</a>
+  </div>
+</div>
+
+<script src="js/game.js?v=1"></script>
+</body>
+</html>

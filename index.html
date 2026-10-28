@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rajat Ranjan | Full-Stack & Gen AI Developer</title>
+<meta name="description" content="Rajat Ranjan, Software Development Intern from Noida, India. Full-stack web apps and Generative AI applications: RAG agents, AI pipelines and gesture interfaces.">
+<meta name="theme-color" content="#05060f">
+<meta property="og:title" content="Rajat Ranjan | Full-Stack & Gen AI Developer">
+<meta property="og:description" content="A 4D portfolio: projects, skills, an interactive terminal and a hyperspace game.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css?v=1">
+<script type="importmap">{"imports":{"three":"./vendor/three.module.min.js"}}</script>
+</head>
+<body>
+<div id="progress" aria-hidden="true"></div>
+<div id="cursor" aria-hidden="true"></div>
+<div id="cursor-dot" aria-hidden="true"></div>
+<canvas id="hyper" aria-hidden="true"></canvas>
+<div class="noise" aria-hidden="true"></div>
+
+<header class="nav">
+  <a href="#top" class="logo" aria-label="Rajat Ranjan, home"><span>R</span>R<em>4D</em></a>
+  <nav>
+    <a href="#about">About</a>
+    <a href="#skills">Skills</a>
+    <a href="#projects">Projects</a>
+    <a href="#play">Game</a>
+    <a href="#terminal">Terminal</a>
+    <a href="#contact">Contact</a>
+  </nav>
+  <button class="kbd-btn" id="open-palette" aria-label="Open command palette"><kbd>Ctrl</kbd><kbd>K</kbd></button>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="hero-text">
+      <p class="eyebrow mono"><span class="pulse"></span> Available for internships and projects</p>
+      <h1 class="glitch" data-text="RAJAT RANJAN">RAJAT RANJAN</h1>
+      <p class="role mono">&gt; <span id="typed"></span><span class="caret">_</span></p>
+      <p class="lead">Software Development Intern building <strong>full-stack</strong> web apps and <strong>Generative AI</strong> applications that feel like the future.</p>
+      <div class="cta">
+        <a href="#projects" class="btn btn-primary magnetic">View projects</a>
+        <a href="game.html" class="btn btn-ghost magnetic">&#9654; Play Hyper Shift</a>
+      </div>
+      <p class="meta mono">Noida, India &middot; <a href="mailto:Rajatranjan06@gmail.com">Rajatranjan06@gmail.com</a></p>
+    </div>
+    <div class="w-panel glass">
+      <p class="mono small">4D CONTROL</p>
+      <label class="mono small" for="w-slider">W axis rotation</label>
+      <input type="range" id="w-slider" min="-314" max="314" value="0">
+      <div class="toggles">
+        <button class="chip active" data-plane="xw">XW</button>
+        <button class="chip active" data-plane="yw">YW</button>
+        <button class="chip active" data-plane="zw">ZW</button>
+        <button class="chip" id="warp-btn">Warp</button>
+      </div>
+      <p class="mono tiny">You are looking at a tesseract: a cube in four dimensions, projected into 3D. Drag it, scroll, or move the slider.</p>
+    </div>
+    <a href="#about" class="scroll-hint mono" aria-label="Scroll down">scroll<span></span></a>
+  </section>
+
+  <section id="about" class="section">
+    <h2 class="section-title reveal"><span class="mono">01.</span> About</h2>
+    <div class="about-grid">
+      <div class="glass about-card reveal">
+        <p>Hi, I am <strong>Rajat</strong>. I build products end to end: the interface people touch, the APIs underneath, and increasingly the AI that makes them smart.</p>
+        <p>My recent work spans <strong>RAG powered support agents</strong>, an <strong>AI interview prep generator</strong>, an <strong>automated YouTube Shorts pipeline</strong>, and a <strong>hand tracking air drawing app</strong> that runs in the browser.</p>
+        <p>I enjoy turning messy ideas into fast, polished, deployed software.</p>
+      </div>
+      <div class="stats">
+        <div class="stat glass reveal"><b data-count="6">0</b><span>public projects</span></div>
+        <div class="stat glass reveal"><b data-count="5">0</b><span>live deployments</span></div>
+        <div class="stat glass reveal"><b data-count="4">0</b><span>dimensions on this page</span></div>
+        <div class="stat glass reveal"><b>&infin;</b><span>curiosity</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills" class="section">
+    <h2 class="section-title reveal"><span class="mono">02.</span> Skills</h2>
+    <div class="skills-grid">
+      <div class="skill-col glass reveal tilt">
+        <h3><i class="dot c1"></i>Frontend</h3>
+        <ul class="tags"><li>TypeScript</li><li>JavaScript</li><li>React</li><li>Next.js</li><li>Vite</li><li>Tailwind CSS</li><li>Framer Motion</li><li>WebGL</li></ul>
+      </div>
+      <div class="skill-col glass reveal tilt">
+        <h3><i class="dot c2"></i>Backend</h3>
+        <ul class="tags"><li>Node.js</li><li>Python</li><li>REST APIs</li><li>MongoDB</li><li>Zod</li><li>Web crawling</li><li>CLI tools</li></ul>
+      </div>
+      <div class="skill-col glass reveal tilt">
+        <h3><i class="dot c3"></i>Gen AI</h3>
+        <ul class="tags"><li>LLM apps</li><li>RAG</li><li>ChromaDB</li><li>Prompt engineering</li><li>Text to speech</li><li>MediaPipe</li><li>Streamlit</li></ul>
+      </div>
+      <div class="skill-col glass reveal tilt">
+        <h3><i class="dot c4"></i>Tools</h3>
+        <ul class="tags"><li>Git &amp; GitHub</li><li>Vercel</li><li>OpenAI API</li><li>Anthropic API</li><li>Ollama</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects" class="section">
+    <h2 class="section-title reveal"><span class="mono">03.</span> Projects</h2>
+    <div class="filters reveal" role="tablist">
+      <button class="chip active" data-filter="all">All</button>
+      <button class="chip" data-filter="ai">Gen AI</button>
+      <button class="chip" data-filter="web">Full-Stack / Web</button>
+    </div>
+    <div class="projects">
+      <article class="project glass tilt reveal" data-tags="ai web">
+        <div class="glare"></div>
+        <p class="p-num mono">#01</p>
+        <h3>PrepKit</h3>
+        <p>Full-stack app and batch CLI that turns a job description and company URL into a personalised interview prep kit: company brief, question bank, flashcards and a study schedule.</p>
+        <ul class="tags small"><li>Next.js</li><li>TypeScript</li><li>MongoDB</li><li>LLMs</li></ul>
+        <div class="p-links">
+          <a href="https://prep-kit-eight.vercel.app" target="_blank" rel="noopener" class="btn btn-primary sm">Live demo &#8599;</a>
+          <a href="https://github.com/rajatranjan06-source/PrepKit" target="_blank" rel="noopener" class="btn btn-ghost sm">Code</a>
+        </div>
+      </article>
+      <article class="project glass tilt reveal" data-tags="ai">
+        <div class="glare"></div>
+        <p class="p-num mono">#02</p>
+        <h3>Persona Adaptive Support Agent</h3>
+        <p>Customer support system using RAG: detects the customer persona in real time, retrieves docs from ChromaDB, adapts its tone, and escalates with structured handoff tickets when confidence is low.</p>
+        <ul class="tags small"><li>Python</li><li>RAG</li><li>ChromaDB</li><li>Streamlit</li></ul>
+        <div class="p-links">
+          <a href="https://persona-adaptive-saas-customer-support-agent.streamlit.app/" target="_blank" rel="noopener" class="btn btn-primary sm">Live demo &#8599;</a>
+          <a href="https://github.com/rajatranjan06-source/Persona-Adaptive-Customer-Support-Agent" target="_blank" rel="noopener" class="btn btn-ghost sm">Code</a>
+        </div>
+      </article>
+      <article class="project glass tilt reveal" data-tags="ai web">
+        <div class="glare"></div>
+        <p class="p-num mono">#03</p>
+        <h3>AirDrawer</h3>
+        <p>Draw in the air with one hand and move, scale and rotate your strokes with the other. Real-time hand tracking in the browser with a neon glass interface.</p>
+        <ul class="tags small"><li>React</li><li>MediaPipe</li><li>WebGL</li><li>Framer Motion</li></ul>
+        <div class="p-links">
+          <a href="https://air-drawer-two.vercel.app" target="_blank" rel="noopener" class="btn btn-primary sm">Live demo &#8599;</a>
+          <a href="https://github.com/rajatranjan06-source/AirDrawer" target="_blank" rel="noopener" class="btn btn-ghost sm">Code</a>
+        </div>
+      </article>
+      <article class="project glass tilt reveal" data-tags="ai">
+        <div class="glare"></div>
+        <p class="p-num mono">#04</p>
+        <h3>YouTube Shorts Bot</h3>
+        <p>Fully automated AI pipeline: researches trending topics, writes scripts, generates text to speech narration, assembles short videos with motion tracking and uploads them to YouTube.</p>
+        <ul class="tags small"><li>Python</li><li>LLMs</li><li>TTS</li><li>Automation</li></ul>
+        <div class="p-links">
+          <a href="https://github.com/rajatranjan06-source/youtube-shorts-bot" target="_blank" rel="noopener" class="btn btn-primary sm">Code &#8599;</a>
+        </div>
+      </article>
+      <article class="project glass tilt reveal" data-tags="web">
+        <div class="glare"></div>
+        <p class="p-num mono">#05</p>
+        <h3>Ifeels</h3>
+        <p>A TypeScript web application, designed, built and deployed end to end on Vercel.</p>
+        <ul class="tags small"><li>TypeScript</li><li>Web app</li><li>Vercel</li></ul>
+        <div class="p-links">
+          <a href="https://ifeels.vercel.app" target="_blank" rel="noopener" class="btn btn-primary sm">Live demo &#8599;</a>
+          <a href="https://github.com/rajatranjan06-source/Ifeels" target="_blank" rel="noopener" class="btn btn-ghost sm">Code</a>
+        </div>
+      </article>
+      <article class="project glass tilt reveal" data-tags="web">
+        <div class="glare"></div>
+        <p class="p-num mono">#06</p>
+        <h3>Dentis Website</h3>
+        <p>A responsive, modern website for a dental clinic, focused on clean layout and a smooth experience on every screen.</p>
+        <ul class="tags small"><li>HTML</li><li>CSS</li><li>Responsive</li></ul>
+        <div class="p-links">
+          <a href="https://dentis-website-omega.vercel.app" target="_blank" rel="noopener" class="btn btn-primary sm">Live demo &#8599;</a>
+          <a href="https://github.com/rajatranjan06-source/dentis-website" target="_blank" rel="noopener" class="btn btn-ghost sm">Code</a>
+        </div>
+      </article>
+    </div>
+    <p class="center reveal"><a class="btn btn-ghost magnetic" href="https://github.com/rajatranjan06-source" target="_blank" rel="noopener">All repositories on GitHub &#8599;</a></p>
+  </section>
+
+  <section id="play" class="section">
+    <h2 class="section-title reveal"><span class="mono">04.</span> Play</h2>
+    <div class="game-teaser glass reveal">
+      <canvas id="teaser" aria-hidden="true"></canvas>
+      <div class="teaser-content">
+        <p class="mono eyebrow">MINI GAME</p>
+        <h3>HYPER SHIFT</h3>
+        <p>Race through a 4D tunnel. Walls only exist in one W layer, so shift between the <span class="c1t">cyan</span>, <span class="c2t">magenta</span> and <span class="c3t">gold</span> dimensions to phase straight through them.</p>
+        <p class="mono small">Your best: <b id="best-score">0</b></p>
+        <a href="game.html" class="btn btn-primary magnetic big">&#9654; Launch game</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="terminal" class="section">
+    <h2 class="section-title reveal"><span class="mono">05.</span> Terminal</h2>
+    <div class="term glass reveal">
+      <div class="term-bar"><i></i><i></i><i></i><span class="mono">rajat@hyperspace: ~</span></div>
+      <div class="term-body mono" id="term-out" aria-live="polite"></div>
+      <form class="term-line mono" id="term-form" autocomplete="off">
+        <label for="term-in">rajat@4d:~$</label>
+        <input id="term-in" spellcheck="false" placeholder="type 'help'">
+      </form>
+    </div>
+  </section>
+
+  <section id="contact" class="section">
+    <h2 class="section-title reveal"><span class="mono">06.</span> Contact</h2>
+    <div class="contact glass reveal">
+      <h3 class="big-h">Let us build something <span class="grad">out of this dimension.</span></h3>
+      <div class="contact-grid">
+        <button class="contact-item" id="copy-email" data-copy="Rajatranjan06@gmail.com"><span class="mono small">EMAIL (click to copy)</span><b>Rajatranjan06@gmail.com</b></button>
+        <a class="contact-item" href="tel:+916397068019"><span class="mono small">PHONE</span><b>+91 6397068019</b></a>
+        <a class="contact-item" href="https://github.com/rajatranjan06-source" target="_blank" rel="noopener"><span class="mono small">GITHUB</span><b>rajatranjan06-source</b></a>
+        <div class="contact-item"><span class="mono small">LOCATION</span><b>Noida, India</b></div>
+      </div>
+      <a href="mailto:Rajatranjan06@gmail.com?subject=Hello%20Rajat" class="btn btn-primary magnetic big">Say hello</a>
+    </div>
+  </section>
+</main>
+
+<footer class="footer mono small">
+  <p>&copy; <span id="year">2026</span> Rajat Ranjan. Built in four dimensions.</p>
+  <p class="tiny">Tip: press <kbd>Ctrl</kbd>+<kbd>K</kbd>, or try the Konami code.</p>
+</footer>
+
+<div id="palette" class="palette" hidden>
+  <div class="palette-box glass">
+    <input id="palette-in" placeholder="Jump to, open, copy..." aria-label="Command">
+    <ul id="palette-list"></ul>
+  </div>
+</div>
+<div id="toast" class="toast mono" role="status"></div>
+
+<script type="module" src="js/main.js?v=1"></script>
+</body>
+</html>
